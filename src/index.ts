@@ -5,6 +5,8 @@ import { startup } from "@/helper";
 import { createPost, getAllPosts } from "./controller";
 import { envs } from "./utils";
 import { authRouter } from "@/router";
+import { validate } from "./middleware";
+import { newPostSchema } from "./schema";
 
 startup();
 
@@ -21,7 +23,9 @@ app.get("/health", (_req, res) => {
 
 app.use("/auth", authRouter);
 
-app.get("/posts", getAllPosts).post("/post", createPost);
+app
+  .get("/posts", getAllPosts)
+  .post("/post", validate(newPostSchema), createPost);
 
 const { PORT } = envs;
 

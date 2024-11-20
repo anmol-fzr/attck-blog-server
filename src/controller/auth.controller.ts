@@ -1,12 +1,11 @@
 import { User } from "@/model";
-import { loginSchema } from "@/schema";
+import { loginSchema, signUpSchema } from "@/schema";
 import { Request, Response } from "express";
 import { z } from "zod";
-import * as jwt from "jsonwebtoken";
 import { jwtHelper, passHelper } from "@/helper";
-import { envs } from "@/utils";
 
 type LoginBody = z.infer<typeof loginSchema>["body"];
+type SignUpBody = z.infer<typeof signUpSchema>["body"];
 
 const loginHndlr = async (req: Request, res: Response) => {
   const { email, password: rawPass }: LoginBody = req.body;
@@ -41,8 +40,23 @@ const loginHndlr = async (req: Request, res: Response) => {
   });
 };
 
-const signupHndlr = (req: Request, res: Response) => {
-  return res.json({ data: null });
+const signupHndlr = async (req: Request, res: Response) => {
+  const { email, password: rawPass }: SignUpBody = req.body;
+
+  const foundUser = await User.findOne({ email }).lean();
+
+  if (foundUser !== null) {
+    return res.status(400).json({
+      message: "User with this Email already Exists",
+    });
+  }
+
+  const passwordHash = await passHelper.hash(rawPass);
+
+  const newUser = new User({ email, passwordHash });
+  await newUser.save();
+
+  return res.json({ message: "Signed up Successfully" });
 };
 
 export { loginHndlr, signupHndlr };
