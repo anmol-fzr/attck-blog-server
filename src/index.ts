@@ -1,19 +1,21 @@
-import { env } from "@/common/utils/envConfig";
-import { app, logger } from "@/server";
+import cors from "cors";
+import express, { type Express } from "express";
+import helmet from "helmet";
+import { pino } from "pino";
+import { startup } from "@/helper";
+import { createPost, getAllPosts, loginHndlr, signupHndlr } from "./controller";
 
-const server = app.listen(env.PORT, () => {
-  const { NODE_ENV, HOST, PORT } = env;
-  logger.info(`Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`);
-});
+startup();
 
-const onCloseSignal = () => {
-  logger.info("sigint received, shutting down");
-  server.close(() => {
-    logger.info("server closed");
-    process.exit();
-  });
-  setTimeout(() => process.exit(1), 10000).unref(); // Force shutdown after 10s
-};
+const logger = pino({ name: "server start" });
+const app: Express = express();
 
-process.on("SIGINT", onCloseSignal);
-process.on("SIGTERM", onCloseSignal);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "*", credentials: true }));
+app.use(helmet());
+
+app.post("/login", loginHndlr).post("/signup", signupHndlr);
+app.get("/posts", getAllPosts).post("/post", createPost);
+
+export { app, logger };
