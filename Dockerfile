@@ -1,10 +1,12 @@
-FROM node:22.11.0-slim
+FROM node:20-slim
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm i
+RUN npm i -g typescript
 COPY . .
 
-EXPOSE 8080
+RUN apt-get -y update
+RUN apt-get -y install curl
 
-CMD npm run dev
+CMD ["npm", "run", "dev"]

@@ -7,6 +7,8 @@ const connnectMongo = async () => {
       console.log("MongoDB Already Connected");
       return;
     }
+    console.log(envs.MONGO_URI);
+    console.log("MongoDB connecting ...");
     await mongoose.connect(envs.MONGO_URI);
     console.log("MongoDB connected Successfully ");
   } catch (error: Error | any) {

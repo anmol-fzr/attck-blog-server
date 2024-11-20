@@ -4,7 +4,8 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --clear-screen=false --env-file .env src/index.ts | pino-pretty",
+    "dev-old": "tsx watch --clear-screen=false --env-file .env src/index.ts",
+    "dev": "npx tsx --env-file=.env --watch  src/index.ts",
     "build": "tsup",
     "start": "node dist/index.js",
     "lint": "biome check src/",
@@ -12,16 +13,19 @@
     "format": "biome format src/"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "express": "^4.21.1",
     "helmet": "^8.0.0",
-    "mongoose": "^8.8.2",
+    "mongoose": "^8.7.2",
     "pino": "^9.4.0",
     "pino-http": "^10.0.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "husky": "^9.0.11",

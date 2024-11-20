@@ -5,3 +5,4 @@ function startup() {
 }
 
 export { startup };
+export * from "./pass.helper";
