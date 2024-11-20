@@ -5,6 +5,7 @@ const envs = Object.freeze({
 
   PORT: env.PORT ?? 3000,
   MONGO_URI: env.MONGO_URI ?? "",
+  JWT_SECRET_KEY: env.JWT_SECRET ?? "",
 });
 
 export { envs };

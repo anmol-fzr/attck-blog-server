@@ -2,14 +2,14 @@ import { User } from "@/model";
 import { loginSchema } from "@/schema";
 import { Request, Response } from "express";
 import { z } from "zod";
-import bcryptjs from "bcryptjs";
+import * as jwt from "jsonwebtoken";
+import { jwtHelper, passHelper } from "@/helper";
+import { envs } from "@/utils";
 
 type LoginBody = z.infer<typeof loginSchema>["body"];
 
-const numSaltRounds = 8;
-
 const loginHndlr = async (req: Request, res: Response) => {
-  const { email, password: rawPassword }: LoginBody = req.body;
+  const { email, password: rawPass }: LoginBody = req.body;
 
   const foundUser = await User.findOne({ email }).lean();
 
@@ -19,8 +19,7 @@ const loginHndlr = async (req: Request, res: Response) => {
     });
   }
 
-  const password = await bcryptjs.hash(rawPassword, numSaltRounds);
-  const isPassMatch = await bcryptjs.compare(password, foundUser.passwordHash);
+  const isPassMatch = passHelper.compare(rawPass, foundUser.passwordHash);
 
   if (!isPassMatch) {
     return res.status(400).json({
@@ -28,7 +27,18 @@ const loginHndlr = async (req: Request, res: Response) => {
     });
   }
 
-  return res.json({ data: null });
+  const token = jwtHelper.getToken({
+    userId: foundUser._id.toString(),
+    email,
+  });
+
+  return res.json({
+    data: {
+      token,
+      email,
+    },
+    message: "Loggedin Successfully",
+  });
 };
 
 const signupHndlr = (req: Request, res: Response) => {
