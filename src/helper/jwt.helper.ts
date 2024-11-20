@@ -26,3 +26,4 @@ const jwtHelper = {
 };
 
 export { jwtHelper };
+export type { GetTokenPayload };

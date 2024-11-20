@@ -7,6 +7,7 @@ import { envs } from "./utils";
 import { authRouter } from "@/router";
 import { validate } from "./middleware";
 import { newPostSchema } from "./schema";
+import { authenticate } from "./middleware/authenticate.middleware";
 
 startup();
 
@@ -23,9 +24,11 @@ app.get("/health", (_req, res) => {
 
 app.use("/auth", authRouter);
 
-app
-  .get("/posts", getAllPosts)
-  .post("/post", validate(newPostSchema), createPost);
+app.get("/posts", getAllPosts);
+
+app.use(authenticate);
+
+app.post("/post", validate(newPostSchema), createPost);
 
 const { PORT } = envs;
 
