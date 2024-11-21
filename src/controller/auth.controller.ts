@@ -26,13 +26,16 @@ const loginHndlr = async (req: Request, res: Response) => {
     });
   }
 
+  const userId = foundUser._id.toString()
+
   const token = jwtHelper.getToken({
-    userId: foundUser._id.toString(),
+    userId,
     email,
   });
 
   return res.json({
     data: {
+      userId,
       token,
       email,
     },

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { query, Request, Response } from "express";
 import { newPostSchema } from "@/schema";
 import { z } from "zod";
 import { Post } from "@/model";
@@ -9,6 +9,7 @@ type PostBody = z.infer<typeof newPostSchema>["body"];
 // handles multiple with authorId filter
 const getAllPosts = async (req: Request, res: Response) => {
   const authorId = req.query.authorId;
+  const _id = req.query._id;
 
   const aggr = new Aggregate();
 
@@ -24,6 +25,18 @@ const getAllPosts = async (req: Request, res: Response) => {
     });
   }
 
+  if (_id) {
+    aggr.match({
+      $expr: {
+        $regexMatch: {
+          input: { $toString: "$_id" },
+          regex: _id,
+          options: "i",
+        },
+      },
+    });
+  }
+
   aggr.sort({
     createdAt: -1,
   });
@@ -32,17 +45,17 @@ const getAllPosts = async (req: Request, res: Response) => {
 
   const posts = await Post.aggregate(pipeline);
 
-  return res.json({ data: posts });
+  return res.json({ data: _id ? posts[0] : posts });
 };
 
 const createPost = async (req: Request, res: Response) => {
-  const { title, content }: PostBody = req.body;
+  const { title, desc, content }: PostBody = req.body;
   const { userId } = req.user;
 
-  const newPost = new Post({ title, content, authorId: userId });
+  const newPost = new Post({ title, desc, content, authorId: userId });
   const savedPost = await newPost.save();
 
-  return res.json({ data: savedPost });
+  return res.json({ data: savedPost, message: "Post Published Successfully" });
 };
 
 export { createPost, getAllPosts };

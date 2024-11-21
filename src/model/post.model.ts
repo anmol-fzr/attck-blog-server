@@ -2,6 +2,7 @@ import { Model, model, ObjectId, Schema } from "mongoose";
 
 type IPost = {
   title: string;
+  desc: string;
   content: string;
   authorId: ObjectId;
 };
@@ -9,6 +10,10 @@ type IPost = {
 const postSchema = new Schema<IPost, Model<IPost>>(
   {
     title: {
+      type: Schema.Types.String,
+      required: true,
+    },
+    desc: {
       type: Schema.Types.String,
       required: true,
     },
